@@ -14,7 +14,7 @@ HTTP servers, but it has many other potential use cases.
 Clusters running with teamster listen for the Unix signal `SIGTERM`, and then
 attempt to shut down their worker processes gracefully. This is useful in both
 single-worker and multiple-worker situations, as in both cases it's desirable
-for an HTTP server, to finish serving any requests in process before stopping.
+for an HTTP server to finish serving any requests in process before stopping.
 
 When a teamster master receives the `SIGTERM` signal, it tells all of the
 workers to stop accepting new connections, serve their requests already in
