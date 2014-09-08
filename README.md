@@ -53,5 +53,7 @@ signals onto the worker processes as appropriate.
 | `SIGTERM` | all                     | Ignore and forward `SIGQUIT`                                                                                                                                                                           |
 | `SIGQUIT` | all                     | If not already shutting down, begin to attempt a graceful shutdown of all workers. If a worker does not shut down after `timeout`, the worker is killed immediately. If already shutting down, ignore. |
 | `SIGINT`  | once                    | Log the signal and then forward it again, which will immmediately kill the master and all worker processes.                                                                                            |
+| `SIGTTIN` | all                     | Fork an additional worker unless shutting down.                                                                                                                                                        |
+| `SIGTTOU` | all                     | Disconnect a worker unless shutting down. When the number of workers reaches 0, the master process will exit.                                                                                          |
 
 [unix_signals]: http://en.wikipedia.org/wiki/Unix_signal
