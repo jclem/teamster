@@ -41,3 +41,17 @@ Both `#run` and `#runServer` accept an optional second `options` argument.
 | `numWorkers` | number          | # cpus      | The number of workers to fork                                                             |   ✓    |      ✓       |
 | `timeout`    | number          | `5000`      | The number of seconds to wait after attempting graceful shutdown to forcibly kill workers |   ✓    |      ✓       |
 | `port`       | number, string  | `undefined` | The port that the server should bind to                                                   |        |      ✓       |
+
+## Signals
+
+Teamster works by responding to [Unix signals][unix_signals]. Typically, you'll
+only want to send signals to teamster's master process, and it will forward
+signals onto the worker processes as appropriate.
+
+| Signal    | Trap all or once?       | Effect                                                                                                                                                                                                 |
+| --------- | ----------------------- | ----------------------------                                                                                                                                                                           |
+| `SIGTERM` | all                     | Ignore and forward `SIGQUIT`                                                                                                                                                                           |
+| `SIGQUIT` | all                     | If not already shutting down, begin to attempt a graceful shutdown of all workers. If a worker does not shut down after `timeout`, the worker is killed immediately. If already shutting down, ignore. |
+| `SIGINT`  | once                    | Log the signal and then forward it again, which will immmediately kill the master and all worker processes.                                                                                            |
+
+[unix_signals]: http://en.wikipedia.org/wiki/Unix_signal
