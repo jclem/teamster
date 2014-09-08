@@ -1,6 +1,24 @@
 # teamster
 
-Unix-y cluster manager
+> **The twelve-factor app's [processes][processes] are *disposable*, meaning
+> they can be started or stopped at a moment's notice.** This facilitates fast
+> elastic scaling, rapid deployment of [code][code] or [config][config]
+> changes, and robustness of production deploys.
+
+*— [The Twelve-Factor App][twelve-factor]*
+
+Teamster is a Twelve-Factor-compliant, Unix-y cluster manager for Node. Its
+primary use is to facilitate the painless running and graceful shutdown of
+HTTP servers, but it has many other potential use cases.
+
+Clusters running with teamster listen for the Unix signal `SIGTERM`, and then
+attempt to shut down their worker processes gracefully. This is useful in both
+single-worker and multiple-worker situations, as in both cases it's desirable
+for an HTTP server, to finish serving any requests in process before stopping.
+
+When a teamster master receives the `SIGTERM` signal, it tells all of the
+workers to stop accepting new connections, serve their requests already in
+progress, and then exit.
 
 ## Usage
 
@@ -57,3 +75,7 @@ signals onto the worker processes as appropriate.
 | `SIGTTOU` | all                     | Disconnect a worker unless shutting down. When the number of workers reaches 0, the master process will exit.                                                                                          |
 
 [unix_signals]: http://en.wikipedia.org/wiki/Unix_signal
+[processes]: http://12factor.net/processes
+[code]: http://12factor.net/codebase
+[config]: http://12factor.net/config
+[twelve-factor]: http://12factor.net
