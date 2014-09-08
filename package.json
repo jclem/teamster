@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/jclem/teamster",
   "dependencies": {
-    "logfmt": "^1.1.2"
+    "logfmt": "^1.1.2",
+    "dev-null": "^0.1.1"
   }
 }
