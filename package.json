@@ -25,5 +25,9 @@
   "dependencies": {
     "logfmt": "^1.1.2",
     "dev-null": "^0.1.1"
+  },
+  "devDependencies": {
+    "mocha": "^1.21.4",
+    "should": "^4.0.4"
   }
 }

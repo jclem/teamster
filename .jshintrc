@@ -1,5 +1,11 @@
 {
   "globalstrict": true,
   "node": true,
-  "unused": true
+  "unused": true,
+  "globals": {
+    "afterEach": false,
+    "beforeEach": false,
+    "describe": false,
+    "it": false
+  }
 }
