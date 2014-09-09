@@ -3,6 +3,7 @@
 var fs     = require('fs');
 var os     = require('os');
 var spawn  = require('child_process').spawn;
+var tree   = require('ps-tree');
 
 require('should');
 
@@ -19,7 +20,7 @@ describe('#run', function() {
   });
 
   it('runs a worker for each CPU by default', function(done) {
-    setupTest({ workers: 'null' }, function(err, contents) {
+    setupTest({ workers: null }, function(err, contents) {
       if (err) { throw err; }
 
       contents.should.eql(os.cpus().reduce(function(expected) {
@@ -61,6 +62,97 @@ describe('#run', function() {
     itAttemptsAGracefulExit('SIGQUIT');
   });
 
+  describe('when receiving a SIGTTIN', function() {
+    describe('when it is not shutting down', function() {
+      it('forks a new worker', function(done) {
+        var child = spawnChild({ workers: 1 });
+
+        workerSpawned(child, 1, function() {
+          child.kill('SIGTTIN');
+
+          child.on('message', function(message) {
+            if (message === 'fork') {
+              tree(child.pid, function(err, children) {
+                if (err) { throw err; }
+                children.length.should.eql(2);
+                done();
+              });
+            }
+          });
+        });
+      });
+    });
+
+    describe('when it is already shutting down', function() {
+      it('does not fork a new worker', function(done) {
+        var child = spawnChild({ workers: 1 });
+
+        workerSpawned(child, 1, function() {
+          child.kill('SIGQUIT');
+          child.kill('SIGTTIN');
+
+          child.on('message', function(message) {
+            if (message === 'fork') {
+              throw new Error('Should not fork new worker');
+            }
+          });
+
+          child.on('exit', function() {
+            done();
+          });
+        });
+      });
+    });
+  });
+
+  describe('when receiving a SIGTTOU', function() {
+    describe('when it is not shutting down', function() {
+      it('shuts down a worker', function(done) {
+        var child = spawnChild({ workers: 1 });
+
+        workerSpawned(child, 1, function() {
+          child.kill('SIGTTOU');
+
+          child.on('message', function(message) {
+            if (message !== 'disconnect') { return; }
+
+            tree(child.pid, function(err, children) {
+              if (err) { throw err; }
+              children.length.should.eql(0);
+              done();
+            });
+          });
+        });
+      });
+    });
+
+    describe('when it is already shutting down', function() {
+      it('does not fork a new worker', function(done) {
+        var child = spawnChild({ workers: 1 });
+
+        workerSpawned(child, 1, function() {
+          child.kill('SIGQUIT');
+
+          child.on('message', function(message) {
+            if (message !== 'disconnect') { return; }
+
+            child.kill('SIGTTOU');
+
+            child.on('message', function(message) {
+              if (message === 'disconnect') {
+                throw new Error('Should not disconnect a worker');
+              }
+            });
+
+            child.on('exit', function() {
+              done();
+            });
+          });
+        });
+      });
+    });
+  });
+
   function itAttemptsAGracefulExit(signal) {
     describe('and the cluster exits before the timeout', function() {
       it('gracefully shuts down', function(done) {
@@ -88,11 +180,7 @@ describe('#run', function() {
       options = {};
     }
 
-    options         = options || {};
-    options.signal  = options.signal || 'SIGTERM';
-    options.timeout = options.timeout || null;
-    options.verbose = options.verbose || 'false';
-    options.workers = options.workers || 1;
+    options = defaultOptions(options);
 
     var child = spawnChild(options);
 
@@ -109,19 +197,22 @@ describe('#run', function() {
   }
 
   function spawnChild(options) {
+    options = defaultOptions(options);
+
     var args = [testFile, options.workers, options.timeout, options.verbose];
 
     if (options.stopTimeout) {
       args.push(options.stopTimeout);
     }
 
-    return spawn('node', args, { stdio: [null, null, null, 'ipc'] });
-  }
+    var child = spawn('node', args, { stdio: [null, null, null, 'ipc'] });
 
-  function unlinkOutput(done) {
-    fs.unlink(outFile, function() {
-      done(); // Ignore error, test/out.txt should not exist.
-    });
+    if (options.debug) {
+      child.stdout.pipe(process.stdout);
+      child.stderr.pipe(process.stdout);
+    }
+
+    return child;
   }
 
   function workerSpawned(child, workers, cb) {
@@ -133,9 +224,35 @@ describe('#run', function() {
         spawnedWorkers++;
 
         if (spawnedWorkers === workerCount) {
-          cb(message.split(': ')[1]);
+          cb();
         }
       }
+    });
+  }
+
+  function defaultOptions(options) {
+    options = options || {};
+
+    var defaults = {
+      signal     : 'SIGTERM',
+      stopTimeout: null,
+      timeout    : null,
+      verbose    : false,
+      workers    : 1
+    };
+
+    for (var key in defaults) {
+      if (!options.hasOwnProperty(key)) {
+        options[key] = defaults[key];
+      }
+    }
+
+    return options;
+  }
+
+  function unlinkOutput(done) {
+    fs.unlink(outFile, function() {
+      done(); // Ignore error, test/out.txt should not exist.
     });
   }
 });

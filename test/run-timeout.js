@@ -10,9 +10,15 @@ var stopTimeout = JSON.parse(process.argv[5] || 'null');
 
 if (cluster.isMaster) {
   cluster.on('fork', function(child) {
+    process.send('fork');
+
     child.on('message', function(message) {
       process.send(message);
     });
+  });
+
+  cluster.on('disconnect', function(worker) {
+    process.send('disconnect');
   });
 }
 
