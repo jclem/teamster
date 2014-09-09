@@ -1,4 +1,4 @@
-# teamster
+# teamster [![Build Status](https://travis-ci.org/jclem/teamster.svg?branch=master)](https://travis-ci.org/jclem/teamster)
 
 > **The twelve-factor app's [processes][processes] are *disposable*, meaning
 > they can be started or stopped at a moment's notice.** This facilitates fast
