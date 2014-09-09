@@ -54,9 +54,17 @@ describe('#run', function() {
   });
 
   describe('when receiving a SIGTERM', function() {
+    itAttemptsAGracefulExit('SIGTERM');
+  });
+
+  describe('when receiving a SIGQUIT', function() {
+    itAttemptsAGracefulExit('SIGQUIT');
+  });
+
+  function itAttemptsAGracefulExit(signal) {
     describe('and the cluster exits before the timeout', function() {
       it('gracefully shuts down', function(done) {
-        setupTest({ workers: 1 }, function(err, contents) {
+        setupTest({ workers: 1, signal: signal }, function(err, contents) {
           if (err) { throw err; }
           contents.should.eql('run-timeout\n');
           done();
@@ -66,13 +74,13 @@ describe('#run', function() {
 
     describe('and the cluster does not exit before the timeout', function() {
       it('kills the cluster immediately', function(done) {
-        setupTest({ workers: 1, timeout: 200, stopTimeout: 5 }, function(err) {
+        setupTest({ workers: 1, timeout: 200, stopTimeout: 5, signal: signal }, function(err) {
           err.code.should.eql('ENOENT');
           done();
         });
       });
     });
-  });
+  }
 
   function setupTest(options, cb) {
     if (typeof options === 'function') {
