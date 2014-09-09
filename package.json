@@ -4,7 +4,7 @@
   "description": "Unix-y cluster manager",
   "main": "index.js",
   "scripts": {
-    "test": "mocha test/**/*-test.js"
+    "test": "istanbul test --hook-run-in-context _mocha -- test/**/*-test.js"
   },
   "repository": {
     "type": "git",
@@ -29,6 +29,8 @@
   "devDependencies": {
     "mocha": "^1.21.4",
     "should": "^4.0.4",
-    "ps-tree": "0.0.3"
+    "ps-tree": "0.0.3",
+    "istanbul": "^0.3.2",
+    "codeclimate-test-reporter": "0.0.3"
   }
 }
