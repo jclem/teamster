@@ -51,27 +51,6 @@ describe('worker', function() {
   });
 
   describe('when receiving SIGTERM', function() {
-    it('logs the SIGTERM', function() {
-      runWorker(function() {});
-      process.emit('SIGTERM');
-      logSpy.callCount.should.eql(1);
-      logSpy.calledWithExactly({
-        event: 'received TERM, waiting for master to disconnect'
-      }).should.eql(true);
-    });
-
-    describe('when receiving a second SIGTERM', function() {
-      it('does not log the SIGTERM', function() {
-        runWorker(function() {});
-        process.emit('SIGTERM');
-        logSpy.reset();
-        process.emit('SIGTERM');
-        logSpy.callCount.should.eql(0);
-      });
-    });
-  });
-
-  describe('when receiving SIGQUIT', function() {
     beforeEach(function() {
       process._exit = process.exit;
     });
@@ -83,16 +62,16 @@ describe('worker', function() {
 
     it('disconnects the worker', function() {
       runWorker(function() {});
-      process.emit('SIGQUIT');
+      process.emit('SIGTERM');
       workerDisconnectSpy.callCount.should.eql(1);
     });
 
-    it('logs the SIGQUIT', function() {
+    it('logs the SIGTERM', function() {
       runWorker(function() {});
-      process.emit('SIGQUIT');
+      process.emit('SIGTERM');
       logSpy.callCount.should.eql(1);
       logSpy.calledWithExactly({
-        event: 'received QUIT, attempting graceful shutdown'
+        event: 'received TERM, attempting graceful shutdown'
       }).should.eql(true);
     });
 
@@ -115,7 +94,7 @@ describe('worker', function() {
 
       it('exits the process with an error status', function(done) {
         runTimeoutWorker();
-        process.emit('SIGQUIT');
+        process.emit('SIGTERM');
 
         process.exit = function(code) {
           code.should.eql(1);
@@ -125,7 +104,7 @@ describe('worker', function() {
 
       it('logs the timeout', function(done) {
         runTimeoutWorker();
-        process.emit('SIGQUIT');
+        process.emit('SIGTERM');
 
         process.exit = function() {
           logSpy.calledWithExactly({

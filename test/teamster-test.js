@@ -55,11 +55,24 @@ describe('teamster', function() {
   });
 
   describe('when receiving a SIGTERM', function() {
-    itAttemptsAGracefulExit('SIGTERM');
-  });
+    describe('and the cluster exits before the timeout', function() {
+      it('gracefully shuts down', function(done) {
+        setupTest({ workers: 1, signal: 'SIGTERM' }, function(err, contents) {
+          if (err) { throw err; }
+          contents.should.eql('run-timeout\n');
+          done();
+        });
+      });
+    });
 
-  describe('when receiving a SIGQUIT', function() {
-    itAttemptsAGracefulExit('SIGQUIT');
+    describe('and the cluster does not exit before the timeout', function() {
+      it('kills the cluster immediately', function(done) {
+        setupTest({ workers: 1, timeout: 200, stopTimeout: 5, signal: 'SIGTERM' }, function(err) {
+          err.code.should.eql('ENOENT');
+          done();
+        });
+      });
+    });
   });
 
   describe('when receiving a SIGTTIN', function() {
@@ -88,7 +101,7 @@ describe('teamster', function() {
         var child = spawnChild({ workers: 1 });
 
         workerSpawned(child, 1, function() {
-          child.kill('SIGQUIT');
+          child.kill('SIGTERM');
           child.kill('SIGTTIN');
 
           child.on('message', function(message) {
@@ -131,7 +144,7 @@ describe('teamster', function() {
         var child = spawnChild({ workers: 1 });
 
         workerSpawned(child, 1, function() {
-          child.kill('SIGQUIT');
+          child.kill('SIGTERM');
 
           child.on('message', function(message) {
             if (message !== 'disconnect') { return; }
@@ -152,27 +165,6 @@ describe('teamster', function() {
       });
     });
   });
-
-  function itAttemptsAGracefulExit(signal) {
-    describe('and the cluster exits before the timeout', function() {
-      it('gracefully shuts down', function(done) {
-        setupTest({ workers: 1, signal: signal }, function(err, contents) {
-          if (err) { throw err; }
-          contents.should.eql('run-timeout\n');
-          done();
-        });
-      });
-    });
-
-    describe('and the cluster does not exit before the timeout', function() {
-      it('kills the cluster immediately', function(done) {
-        setupTest({ workers: 1, timeout: 200, stopTimeout: 5, signal: signal }, function(err) {
-          err.code.should.eql('ENOENT');
-          done();
-        });
-      });
-    });
-  }
 
   function setupTest(options, cb) {
     if (typeof options === 'function') {

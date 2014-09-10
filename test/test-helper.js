@@ -6,7 +6,6 @@ exports.removeProcessListeners = function() {
   [
     'SIGINT',
     'SIGTERM',
-    'SIGQUIT',
     'SIGTTIN',
     'SIGTTOU'
   ].forEach(function(event) {

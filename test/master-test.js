@@ -151,56 +151,39 @@ describe('master', function() {
     });
 
     describe('when receiving a SIGTERM', function() {
-      beforeEach(function() {
-        process.emit('SIGTERM');
-      });
-
-      it('logs the SIGTERM', function() {
-        logs.should.eql([
-          util.format('source=teamster:master pid=%d event="forwarding TERM to QUIT"\n', process.pid)
-        ]);
-      });
-
-      it('forwards a SIGQUIT', function() {
-        kill.callCount.should.eql(1);
-        kill.calledWithExactly(process.pid, 'SIGQUIT').should.eql(true);
-      });
-    });
-
-    describe('when receiving a QUIT', function() {
       describe('if it is not already shutting down', function() {
         beforeEach(function() {
-          process.emit('SIGQUIT');
+          process.emit('SIGTERM');
         });
 
-        it('logs the QUIT event', function() {
+        it('logs the TERM event', function() {
           logs.should.eql([
-            util.format('source=teamster:master pid=%d event="received QUIT, attempting graceful shutdown"\n', process.pid)
+            util.format('source=teamster:master pid=%d event="received TERM, attempting graceful shutdown"\n', process.pid)
           ]);
         });
 
         it('kills the workers', function() {
           kill.args.should.eql([
-            [mockCluster.workers[1].process.pid, 'SIGQUIT']
+            [mockCluster.workers[1].process.pid, 'SIGTERM']
           ]);
         });
       });
 
       describe('if it is already shutting down', function() {
         beforeEach(function() {
-          process.emit('SIGQUIT');
+          process.emit('SIGTERM');
           process.kill.restore();
           kill = sinon.stub(process, 'kill');
-          process.emit('SIGQUIT');
+          process.emit('SIGTERM');
         });
 
-        it('logs the QUIT ignore', function() {
+        it('logs the TERM ignore', function() {
           logs[1].should.eql(
-            util.format('source=teamster:master pid=%d event="ignoring QUIT, already shutting down"\n', process.pid)
+            util.format('source=teamster:master pid=%d event="ignoring TERM, already shutting down"\n', process.pid)
           );
         });
 
-        it('ignores the QUIT', function() {
+        it('ignores the TERM', function() {
           kill.callCount.should.eql(0);
         });
       });
@@ -227,7 +210,7 @@ describe('master', function() {
       describe('when it is already shutting down', function() {
         beforeEach(function() {
           mockCluster.fork.reset();
-          process.emit('SIGQUIT');
+          process.emit('SIGTERM');
           process.emit('SIGTTIN');
         });
 
@@ -264,7 +247,7 @@ describe('master', function() {
       describe('when it is already shutting down', function() {
         beforeEach(function() {
           mockCluster.fork.reset();
-          process.emit('SIGQUIT');
+          process.emit('SIGTERM');
           process.emit('SIGTTOU');
         });
 
