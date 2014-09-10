@@ -240,7 +240,9 @@ describe('master', function() {
         });
 
         it('disconnects a worker', function() {
-          mockCluster.workers[1].disconnect.callCount.should.eql(1);
+          kill.args.should.eql([
+            [mockCluster.workers[1].process.pid, 'SIGTERM']
+          ]);
         });
       });
 
