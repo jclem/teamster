@@ -8,7 +8,7 @@ var util         = require('util');
 var helpers      = require('./test-helper');
 
 describe('master', function() {
-  var logs, master, mockCluster, stream;
+  var disconnectSpy, logs, master, mockCluster, stream;
 
   beforeEach(function() {
     logs = [];
@@ -244,6 +244,23 @@ describe('master', function() {
             [mockCluster.workers[1].process.pid, 'SIGTERM']
           ]);
         });
+
+        describe('and there are no more workers to disconnect', function() {
+          beforeEach(function() {
+            mockCluster.workers = {};
+            process.emit('SIGTTOU');
+          });
+
+          it('logs the ignored TTOU', function() {
+            logs[1].should.eql(
+              util.format('source=teamster:master pid=%d event="ignoring TTOU, all workers disconnected"\n', process.pid)
+            );
+          });
+
+          it('does not disconnect a worker', function() {
+            disconnectSpy.callCount.should.eql(0);
+          });
+        });
       });
 
       describe('when it is already shutting down', function() {
@@ -260,7 +277,7 @@ describe('master', function() {
         });
 
         it('does not disconnect a worker', function() {
-          mockCluster.workers[1].disconnect.callCount.should.eql(0);
+          disconnectSpy.callCount.should.eql(0);
         });
       });
     });
@@ -269,11 +286,12 @@ describe('master', function() {
   function createMockCluster() {
     var mock = new EventEmitter();
     mock.fork = sinon.spy();
+    disconnectSpy = sinon.spy();
 
     mock.workers = {
       1: {
         process: { pid: 10 },
-        disconnect: sinon.spy()
+        disconnect: disconnectSpy
       }
     };
 
