@@ -25,7 +25,7 @@ describe('worker', function() {
 
     process.kill = process._kill;
     delete process._kill;
-    process.removeAllListeners();
+    removeProcessListeners();
   });
 
   it('calls the worker function', function() {
@@ -144,6 +144,18 @@ describe('worker', function() {
       }
     }
   });
+
+  function removeProcessListeners() {
+    [
+      'SIGINT',
+      'SIGTERM',
+      'SIGQUIT',
+      'SIGTTIN',
+      'SIGTTOU'
+    ].forEach(function(event) {
+      process.removeAllListeners(event);
+    });
+  }
 
   function runWorker(fn, options) {
     options = options || {};
