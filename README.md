@@ -7,25 +7,25 @@
 
 *— [The Twelve-Factor App][twelve-factor]*
 
-Teamster is a Twelve-Factor-compliant, Unix-y cluster manager for Node. Its
-primary use is to facilitate the painless running and graceful shutdown of
+Teamster is a Twelve-Factor-compliant, Unix-y worker process manager for Node.
+Its primary use is to facilitate the painless running and graceful shutdown of
 HTTP servers, but it has many other potential use cases.
 
 Clusters running with teamster listen for the Unix signal `SIGTERM`, and then
 attempt to shut down their worker processes gracefully. This is useful in both
 single-worker and multiple-worker situations, as in both cases it's desirable
-for an HTTP server to finish serving any requests in process before stopping.
+for an HTTP server to finish serving any requests in progress before exiting.
 
-When a teamster master receives the `SIGTERM` signal, it tells all of the
-workers to stop accepting new connections, serve their requests already in
-progress, and then exit.
+When a teamster master process receives the `SIGTERM` signal, it tells all of
+the worker processes to stop accepting new connections, serve their requests
+already in progress, and then exit.
 
 ## Usage
 
 ### Run a function
 
-Teamster can run a single function for you in a forking model. Simply pass
-`#run` a function as your first argument.
+Teamster can run a single function for you in a worker or workers. Simply pass
+`#run` a function as the first argument.
 
 ```javascript
 require('teamster').run(function() {
@@ -58,7 +58,7 @@ Both `#run` and `#runServer` accept an optional second `options` argument.
 | `verbose`    | boolean         | `true`      | Whether or not to include verbose logging of fork/disconnect/exit events                  |   ✓    |      ✓       |
 | `numWorkers` | number          | # cpus      | The number of workers to fork                                                             |   ✓    |      ✓       |
 | `timeout`    | number          | `5000`      | The number of seconds to wait after attempting graceful shutdown to forcibly kill workers |   ✓    |      ✓       |
-| `port`       | number, string  | `undefined` | The port that the server should bind to                                                   |        |      ✓       |
+| `port`       | number, string  | `undefined` | The port that the server should listen on                                                 |        |      ✓       |
 
 ## Signals
 
@@ -73,6 +73,14 @@ signals onto the worker processes as appropriate.
 | `SIGINT`  | once                    | Log the signal and then forward it again, which will immmediately kill the master and all worker processes.                                                                                            |
 | `SIGTTIN` | all                     | Fork an additional worker unless shutting down.                                                                                                                                                        |
 | `SIGTTOU` | all                     | Disconnect a worker unless shutting down. When the number of workers reaches 0, the master process will exit.                                                                                          |
+
+## Caveat
+
+Node is very fast, and it's unlikely that you need to be run a process for each
+CPU. It's more likely you'll have unused workers and unnecessarily high memory
+usage, unless you've done testing and are sure you'll benefit from running more
+than a single worker process. Even with a single worker, however, teamster is
+useful, as it will take care of graceful worker shutdowns for you.
 
 [unix_signals]: http://en.wikipedia.org/wiki/Unix_signal
 [processes]: http://12factor.net/processes
