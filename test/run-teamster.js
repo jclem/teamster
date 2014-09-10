@@ -17,7 +17,7 @@ if (cluster.isMaster) {
     });
   });
 
-  cluster.on('disconnect', function(worker) {
+  cluster.on('disconnect', function() {
     process.send('disconnect');
   });
 }

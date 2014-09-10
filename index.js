@@ -18,7 +18,7 @@ exports.runServer = function runServer(handler, options) {
   options = options || {};
 
   exports.run(function() {
-    var logger = require('./lib/logger')(options.verbose);
+    var logger = require('./lib/logger')(options.verbose, options.logStream);
 
     require('http')
       .createServer(handler)

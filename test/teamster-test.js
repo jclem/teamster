@@ -8,7 +8,7 @@ var tree   = require('ps-tree');
 require('should');
 
 describe('#run', function() {
-  var testFile = 'test/run-timeout.js';
+  var testFile = 'test/run-teamster.js';
   var outFile  = 'test/out.txt';
 
   beforeEach(function(done) {
