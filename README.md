@@ -86,4 +86,4 @@ useful, as it will take care of graceful worker shutdowns for you.
 [processes]: http://12factor.net/processes
 [code]: http://12factor.net/codebase
 [config]: http://12factor.net/config
-[twelve-factor]: http://12factor.net
+[twelve-factor]: http://12factor.net/disposability
