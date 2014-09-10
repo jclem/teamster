@@ -4,6 +4,11 @@
 > they can be started or stopped at a moment's notice.** This facilitates fast
 > elastic scaling, rapid deployment of [code][code] or [config][config]
 > changes, and robustness of production deploys.
+>
+> Processes **shut down gracefully when they receive a [SIGTERM][sigterm]**
+> signal from the process manager. For a web process, graceful shutdown is
+> achieved by ceasing to listen on the service port (thereby refusing any new
+> requests), allowing any current requests to finish, and then exiting.
 
 *— [The Twelve-Factor App][twelve-factor]*
 
@@ -82,6 +87,7 @@ than a single worker process. Even with a single worker, however, teamster is
 useful, as it will take care of graceful worker shutdowns for you.
 
 [unix_signals]: http://en.wikipedia.org/wiki/Unix_signal
+[sigterm]: http://en.wikipedia.org/wiki/SIGTERM
 [processes]: http://12factor.net/processes
 [code]: http://12factor.net/codebase
 [config]: http://12factor.net/config
