@@ -5,7 +5,7 @@ var sinon   = require('sinon');
 var through = require('through');
 var util    = require('util');
 
-require('should');
+require('./test-helper');
 
 describe('logger', function() {
   var logs, stream;

@@ -2,8 +2,7 @@
 
 var proxy   = require('proxyquire');
 var sinon   = require('sinon');
-
-require('should');
+var helpers = require('./test-helper');
 
 describe('worker', function() {
   var workerDisconnectSpy = sinon.spy();
@@ -25,7 +24,7 @@ describe('worker', function() {
 
     process.kill = process._kill;
     delete process._kill;
-    removeProcessListeners();
+    helpers.removeProcessListeners();
   });
 
   it('calls the worker function', function() {
@@ -144,18 +143,6 @@ describe('worker', function() {
       }
     }
   });
-
-  function removeProcessListeners() {
-    [
-      'SIGINT',
-      'SIGTERM',
-      'SIGQUIT',
-      'SIGTTIN',
-      'SIGTTOU'
-    ].forEach(function(event) {
-      process.removeAllListeners(event);
-    });
-  }
 
   function runWorker(fn, options) {
     options = options || {};

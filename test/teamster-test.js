@@ -5,9 +5,9 @@ var os     = require('os');
 var spawn  = require('child_process').spawn;
 var tree   = require('ps-tree');
 
-require('should');
+require('./test-helper');
 
-describe('#run', function() {
+describe('teamster', function() {
   var testFile = 'test/run-teamster.js';
   var outFile  = 'test/out.txt';
 
