@@ -88,6 +88,7 @@ describe('teamster', function() {
               tree(child.pid, function(err, children) {
                 if (err) { throw err; }
                 children.length.should.eql(2);
+                child.kill();
                 done();
               });
             }
