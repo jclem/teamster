@@ -17,12 +17,12 @@ exports.run = function run(workerFunction, options) {
 exports.runServer = function runServer(handler, options) {
   options = options || {};
 
-  exports.run(function() {
+  exports.run(function runServerWorker() {
     var logger = require('./lib/logger')(options.verbose, options.logStream);
 
     require('http')
       .createServer(handler)
-      .listen(options.port, function() {
+      .listen(options.port, function onServer() {
         logger.log({ event: 'server listening on ' + this.address().port });
       });
   }, options);
