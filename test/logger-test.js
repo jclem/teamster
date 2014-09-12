@@ -34,7 +34,7 @@ describe('logger', function() {
     var outSpy;
 
     beforeEach(function() {
-      outSpy = sinon.spy(process.stdout, 'write');
+      outSpy = sinon.stub(process.stdout, 'write');
     });
 
     afterEach(function() {
