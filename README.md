@@ -25,6 +25,12 @@ When a teamster master process receives the `SIGTERM` signal, it tells all of
 the worker processes to stop accepting new connections, serve their requests
 already in progress, and then exit.
 
+## Install
+
+```sh
+npm install teamster --save
+```
+
 ## Usage
 
 ### Run a function
