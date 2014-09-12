@@ -39,7 +39,7 @@ Teamster can run a single function for you in a worker or workers. Simply pass
 `#run` a function as the first argument.
 
 ```javascript
-require('teamster').run(function() {
+require('teamster').run(function work() {
   console.log('I am a worker!');
 }, options);
 ```
@@ -52,7 +52,7 @@ should be a function with the standard Node request handler signature, which
 includes Express apps.
 
 ```javascript
-require('teamster').runServer(function(req, res) {
+require('teamster').runServer(function handleRequest(req, res) {
   res.end('I am served from a worker!');
 }, options);
 ```
