@@ -4,7 +4,7 @@
   "description": "Unix-y cluster manager",
   "main": "index.js",
   "scripts": {
-    "test": "istanbul test --hook-run-in-context _mocha -- test/**/*-test.js -t 5500"
+    "test": "istanbul test --hook-run-in-context _mocha -- test/**/*-test.js -t 5500 -R dot"
   },
   "repository": {
     "type": "git",
