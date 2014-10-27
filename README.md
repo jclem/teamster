@@ -92,9 +92,16 @@ usage, unless you've done testing and are sure you'll benefit from running more
 than a single worker process. Even with a single worker, however, teamster is
 useful, as it will take care of graceful worker shutdowns for you.
 
+## Thanks, Heroku
+
+While I created and maintain this project, it was done while I was an employee
+of [Heroku][heroku] on the Human Interfaces Team, and they were kind enough to
+allow me to open source the work. Heroku is awesome.
+
 [unix_signals]: http://en.wikipedia.org/wiki/Unix_signal
 [sigterm]: http://en.wikipedia.org/wiki/SIGTERM
 [processes]: http://12factor.net/processes
 [code]: http://12factor.net/codebase
 [config]: http://12factor.net/config
 [twelve-factor]: http://12factor.net/disposability
+[heroku]: https://www.heroku.com/home
