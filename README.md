@@ -70,6 +70,7 @@ Both `#run` and `#runServer` accept an optional second `options` argument.
 | `numWorkers` | number          | # cpus      | The number of workers to fork                                                             |   ✓    |      ✓       |
 | `timeout`    | number          | `5000`      | The number of seconds to wait after attempting graceful shutdown to forcibly kill workers |   ✓    |      ✓       |
 | `port`       | number, string  | `undefined` | The port that the server should listen on                                                 |        |      ✓       |
+| `fork`       | boolean         | `true`      | Whether or not to actually fork a child process (useful for development)                  |   ✓    |      ✓       |
 
 ## Signals
 

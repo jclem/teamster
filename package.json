@@ -23,8 +23,9 @@
   },
   "homepage": "https://github.com/jclem/teamster",
   "dependencies": {
+    "dev-null": "^0.1.1",
     "logfmt": "^1.1.2",
-    "dev-null": "^0.1.1"
+    "sinon": "^1.12.1"
   },
   "devDependencies": {
     "mocha": "^1.21.4",

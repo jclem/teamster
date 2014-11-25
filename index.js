@@ -7,6 +7,8 @@ var worker  = require('./lib/worker');
 exports.run = function run(workerFunction, options) {
   options = options || {};
 
+  if (options.fork === false) { return workerFunction(); }
+
   if (cluster.isMaster) {
     master(options);
   } else {

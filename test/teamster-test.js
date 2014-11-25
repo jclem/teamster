@@ -1,9 +1,12 @@
 'use strict';
 
-var fs     = require('fs');
-var os     = require('os');
-var spawn  = require('child_process').spawn;
-var tree   = require('ps-tree');
+var cluster  = require('cluster');
+var fs       = require('fs');
+var os       = require('os');
+var sinon    = require('sinon');
+var spawn    = require('child_process').spawn;
+var tree     = require('ps-tree');
+var teamster = require('..');
 
 require('./test-helper');
 
@@ -29,6 +32,16 @@ describe('teamster', function() {
 
       done();
     });
+  });
+
+  it('does not fork when given `fork: false`', function(done) {
+    sinon.spy(cluster, 'fork');
+
+    teamster.run(function() {
+      cluster.fork.callCount.should.eql(0);
+      cluster.fork.restore();
+      done();
+    }, { fork: false });
   });
 
   it('runs a worker with a specified number of workers', function(done) {
