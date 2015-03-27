@@ -143,6 +143,7 @@ describe('teamster', function() {
           child.on('message', function(message) {
             if (message !== 'disconnect') { return; }
 
+            // This test only passes w/a timeout in 0.12/io.js
             tree(child.pid, function(err, children) {
               if (err) { throw err; }
               children.length.should.eql(0);
