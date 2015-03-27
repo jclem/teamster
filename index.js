@@ -24,7 +24,7 @@ exports.runServer = function runServer(handler, options) {
 
     require('http')
       .createServer(handler)
-      .listen(options.port, function onServer() {
+      .listen(options.port, options.hostname, function onServer() {
         logger.log({ event: 'server listening on ' + this.address().port });
       });
   }, options);
