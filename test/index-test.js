@@ -7,16 +7,16 @@ var sinon   = require('sinon');
 require('./test-helper');
 
 describe('#run', function() {
-  var index, masterSpy, runSpy, workerSpy;
+  var index, masterStub, runSpy, workerStub;
 
   beforeEach(function() {
-    runSpy    = sinon.spy();
-    masterSpy = sinon.spy();
-    workerSpy = sinon.spy();
+    runSpy     = sinon.spy();
+    masterStub = sinon.stub().returns('masterStubValue');
+    workerStub = sinon.stub().returns('workerStubValue');
 
     index = proxy('..', {
-      './lib/master': masterSpy,
-      './lib/worker': workerSpy
+      './lib/master': masterStub,
+      './lib/worker': workerStub
     });
   });
 
@@ -24,21 +24,35 @@ describe('#run', function() {
     it('calls master', function() {
       index.run(runSpy, { verbose: true });
 
-      masterSpy.args.should.eql([
+      masterStub.args.should.eql([
         [{ verbose: true }]
       ]);
+    });
+
+    it('returns master', function() {
+      index.run(runSpy, { verbose: true }).should.eql('masterStubValue');
     });
   });
 
   describe('when in a worker process', function() {
-    it('calls worker', function() {
+    beforeEach(function() {
       cluster.isMaster = false;
-      index.run(runSpy, { verbose: true });
-      cluster.isMaster = true;
+    });
 
-      workerSpy.args.should.eql([
+    afterEach(function() {
+      cluster.isMaster = true;
+    });
+
+    it('calls worker', function() {
+      index.run(runSpy, { verbose: true });
+
+      workerStub.args.should.eql([
         [runSpy, { verbose: true }]
       ]);
+    });
+
+    it('returns worker', function() {
+      index.run(runSpy, { verbose: true }).should.eql('workerStubValue');
     });
   });
 });

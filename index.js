@@ -10,19 +10,19 @@ exports.run = function run(workerFunction, options) {
   if (options.fork === false) { return workerFunction(); }
 
   if (cluster.isMaster) {
-    master(options);
+    return master(options);
   } else {
-    worker(workerFunction, options);
+    return worker(workerFunction, options);
   }
 };
 
 exports.runServer = function runServer(handler, options) {
   options = options || {};
 
-  exports.run(function runServerWorker() {
+  return exports.run(function runServerWorker() {
     var logger = require('./lib/logger')(options.verbose, options.logStream);
 
-    require('http')
+    return require('http')
       .createServer(handler)
       .listen(options.port, options.hostname, function onServer() {
         logger.log({ event: 'server listening on ' + this.address().port });

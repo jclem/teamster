@@ -33,6 +33,12 @@ describe('worker', function() {
     workerFunctionSpy.calledOnce.should.eql(true);
   });
 
+  it('returns the worker function', function() {
+    var value = 'sausages';
+    function workerFunction() { return value; }
+    runWorker(workerFunction).should.eql(value);
+  });
+
   describe('when receiving SIGINT', function() {
     it('forwards another SIGINT', function() {
       runWorker(function() {});
@@ -126,7 +132,7 @@ describe('worker', function() {
   function runWorker(fn, options) {
     options = options || {};
 
-    proxy('../lib/worker', {
+    return proxy('../lib/worker', {
       './logger': function() {
         return {
           log: logSpy
